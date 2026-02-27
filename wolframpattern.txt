@@ -1,0 +1,169 @@
+In[64]:= 
+
+In[65]:= (*Resilience Sampling Function*)CalculateResilience[rule_,width_]:=Module[{steps=150,mixAt=50,init,clean,injured,diff,score},init=CenterArray[{1},301];
+clean=CellularAutomaton[rule,init,steps];
+(*Apply disruption at mixAt*)injured=Module[{pre,mid,post},pre=Take[clean,mixAt];
+mid=Last[pre];
+(*Random disruption of specified width*)mid[[151-width;;151+width]]=RandomInteger[1,2*width+1];
+post=CellularAutomaton[rule,mid,steps-mixAt];
+Join[pre,post]];
+(*Difference Map XOR*)diff=MapThread[BitXor,{clean,injured},2];
+(*Score:1.0=Perfect Healing;0.0=Total Failure*)score=1.0-(Total[Last[diff]]/Length[Last[diff]]);
+score];
+
+(*Sample Rule 110 across varying injury widths*)
+samplingData=Table[{w,Mean[Table[CalculateResilience[110,w],{10}]]},{w,1,50,2}];
+
+ListLinePlot[samplingData,PlotTheme->"Scientific",AxesLabel->{"Injury Width","Restoration Score"},PlotLabel->"Rule 110: Resilience Threshold Sampling",PlotRange->{0,1.1},Filling->Bottom]
+Out[67]= 
+In[68]:= (*Function to calculate the percentage of recovery*)MeasureRecovery[rule_,injuryWidth_]:=Module[{steps=150,mixAt=50,init,clean,injured,diff},init=CenterArray[{1},301];
+clean=CellularAutomaton[rule,init,steps];
+(*Generate injured state*)injured=Module[{pre,mid,post},pre=Take[clean,mixAt];
+mid=Last[pre];
+(*Randomly perturb a section of width'injuryWidth'*)mid[[151-injuryWidth;;151+injuryWidth]]=RandomInteger[1,2*injuryWidth+1];
+post=CellularAutomaton[rule,mid,steps-mixAt];
+Join[pre,post]];
+(*Calculate XOR Difference*)diff=MapThread[BitXor,{clean,injured},2];
+(*Final row difference:1.0=Perfect recovery,0.0=Total divergence*)1.0-(Total[Last[diff]]/Length[Last[diff]])];
+
+(*Run for Rule 110 across widths 1 to 50*)
+data=Table[{w,Mean[Table[MeasureRecovery[110,w],{10}]]},{w,1,50,2}];
+ListLinePlot[data,PlotTheme->"Scientific",AxesLabel->{"Injury Width (Cells)","Restoration Score"},PlotLabel->"Rule 110: Resilience as a Function of Injury Scale",Filling->Bottom]
+Out[70]= 
+In[71]:= (*Sweep all 256 rules for resilience to a 10-cell injury*)allRulesResilience=Table[{r,MeasureRecovery[r,5]},{r,0,255}];
+
+(*Visualize the top 20 most resilient rules*)
+topRules=TakeSortBy[allRulesResilience,Last,Greater][[{1;;20}]];
+TableForm[topRules,TableHeadings->{None,{"Rule","Resilience Score"}}]
+During evaluation of In[71]:= Part::pkspec1: The expression {1;;20} cannot be used as a part specification.
+Out[73]//TableForm= TakeSortBy[{{0,1.},{1,0.00332226},{2,0.986711},{3,0.0166113},{4,0.983389},{5,0.00996678},{6,0.983389},{7,0.00996678},{8,1.},{9,0.0531561},{10,0.983389},{11,0.0265781},{12,0.983389},{13,0.504983},{14,0.973422},{15,0.0332226},{16,0.986711},{17,0.00996678},{18,0.774086},{19,0.0166113},{20,0.9701},{21,0.},{22,0.627907},{23,0.00996678},{24,0.986711},{25,0.0431894},{26,0.803987},{27,0.0398671},{28,0.976744},{29,0.013289},{30,0.501661},{31,0.0199336},{32,1.},{33,0.0232558},{34,0.986711},{35,0.0332226},{36,0.996678},{37,0.0299003},{38,0.986711},{39,0.0232558},{40,1.},{41,0.0365449},{42,0.980066},{43,0.0265781},{44,0.990033},{45,0.345515},{46,0.973422},{47,0.0332226},{48,0.983389},{49,0.0299003},{50,0.0199336},{51,0.0232558},{52,0.976744},{53,0.0265781},{54,0.272425},{55,0.0232558},{56,0.976744},{57,0.169435},{58,0.0265781},{59,0.0166113},{60,0.893688},{61,0.0365449},{62,0.33887},{63,0.0232558},{64,1.},{65,0.0332226},{66,0.986711},{67,0.0431894},{68,0.993355},{69,0.488372},{70,0.983389},{71,0.0199336},{72,1.},{73,0.604651},{74,0.983389},{75,0.388704},{76,0.990033},{77,0.986711},{78,0.990033},{79,0.511628},{80,0.980066},{81,0.0299003},{82,0.754153},{83,0.0166113},{84,0.973422},{85,0.0265781},{86,0.451827},{87,0.00996678},{88,0.976744},{89,0.395349},{90,0.760797},{91,0.0166113},{92,0.986711},{93,0.488372},{94,0.966777},{95,0.0232558},{96,1.},{97,0.0797342},{98,0.990033},{99,0.169435},{100,0.990033},{101,0.335548},{102,0.880399},{103,0.0365449},{104,1.},{105,0.312292},{106,0.953488},{107,0.0664452},{108,0.983389},{109,0.511628},{110,0.770764},{111,0.0265781},{112,0.976744},{113,0.0232558},{114,0.0199336},{115,0.0166113},{116,0.980066},{117,0.0332226},{118,0.348837},{119,0.00996678},{120,0.933555},{121,0.0730897},{122,0.345515},{123,0.0199336},{124,0.780731},{125,0.0398671},{126,0.79402},{127,0.0365449},{128,1.},{129,0.468439},{130,0.986711},{131,0.352159},{132,0.990033},{133,0.966777},{134,0.976744},{135,0.495017},{136,1.},{137,0.750831},{138,0.976744},{139,0.980066},{140,0.990033},{141,0.980066},{142,0.966777},{143,0.973422},{144,0.983389},{145,0.352159},{146,0.774086},{147,0.504983},{148,0.973422},{149,0.495017},{150,0.634551},{151,0.813953},{152,0.983389},{153,0.860465},{154,0.774086},{155,0.986711},{156,0.980066},{157,0.986711},{158,0.262458},{159,0.986711},{160,1.},{161,0.574751},{162,0.980066},{163,0.0299003},{164,0.996678},{165,0.787375},{166,0.963455},{167,0.850498},{168,1.},{169,0.92691},{170,0.9701},{171,0.973422},{172,0.990033},{173,0.976744},{174,0.976744},{175,0.983389},{176,0.980066},{177,0.0232558},{178,0.0265781},{179,0.0232558},{180,0.980066},{181,0.807309},{182,0.79402},{183,0.893688},{184,0.980066},{185,0.973422},{186,0.00996678},{187,0.983389},{188,0.737542},{189,0.986711},{190,0.501661},{191,0.996678},{192,1.},{193,0.767442},{194,0.986711},{195,0.887043},{196,0.990033},{197,0.976744},{198,0.9701},{199,0.990033},{200,0.980066},{201,0.986711},{202,0.644518},{203,0.990033},{204,0.9701},{205,0.996678},{206,0.990033},{207,0.986711},{208,0.976744},{209,0.973422},{210,0.767442},{211,0.990033},{212,0.973422},{213,0.980066},{214,0.27907},{215,0.986711},{216,0.641196},{217,0.990033},{218,0.199336},{219,0.996678},{220,0.976744},{221,0.986711},{222,0.986711},{223,0.990033},{224,1.},{225,0.946844},{226,0.976744},{227,0.9701},{228,0.996678},{229,0.983389},{230,0.740864},{231,0.983389},{232,0.976744},{233,1.},{234,0.637874},{235,1.},{236,0.980066},{237,1.},{238,0.993355},{239,1.},{240,0.976744},{241,0.980066},{242,0.00996678},{243,0.980066},{244,0.963455},{245,0.983389},{246,0.501661},{247,0.996678},{248,0.644518},{249,1.},{250,0.348837},{251,1.},{252,0.990033},{253,1.},{254,0.993355},{255,1.}},Last,Greater][[{1;;20}]]
+In[74]:= (*Sweep all 256 rules for resilience to a 10-cell injury*)allRulesResilience=Table[{r,MeasureRecovery[r,5]},{r,0,255}];
+
+(*Visualize the top 20 most resilient rules*)
+topRules=TakeSortBy[allRulesResilience,Last,Greater][[{1;;20}]];
+TableForm[topRules,TableHeadings->{None,{"Rule","Resilience Score"}}]
+During evaluation of In[74]:= Part::pkspec1: The expression {1;;20} cannot be used as a part specification.
+Out[76]//TableForm= TakeSortBy[{{0,1.},{1,0.00664452},{2,0.990033},{3,0.013289},{4,0.996678},{5,0.013289},{6,0.980066},{7,0.0166113},{8,1.},{9,0.0531561},{10,0.980066},{11,0.0199336},{12,0.986711},{13,0.488372},{14,0.973422},{15,0.0232558},{16,0.986711},{17,0.0166113},{18,0.787375},{19,0.00664452},{20,0.980066},{21,0.},{22,0.611296},{23,0.},{24,0.983389},{25,0.0564784},{26,0.777409},{27,0.0199336},{28,0.963455},{29,0.0265781},{30,0.481728},{31,0.00996678},{32,1.},{33,0.013289},{34,0.983389},{35,0.0365449},{36,0.990033},{37,0.0199336},{38,0.980066},{39,0.00664452},{40,1.},{41,0.0365449},{42,0.976744},{43,0.0232558},{44,0.990033},{45,0.378738},{46,0.980066},{47,0.0365449},{48,0.983389},{49,0.0265781},{50,0.0332226},{51,0.013289},{52,0.973422},{53,0.0199336},{54,0.262458},{55,0.0265781},{56,0.983389},{57,0.166113},{58,0.0199336},{59,0.013289},{60,0.853821},{61,0.0365449},{62,0.348837},{63,0.0232558},{64,1.},{65,0.0531561},{66,0.983389},{67,0.0498339},{68,0.983389},{69,0.511628},{70,0.963455},{71,0.0232558},{72,0.986711},{73,0.538206},{74,0.973422},{75,0.358804},{76,0.980066},{77,0.976744},{78,0.963455},{79,0.498339},{80,0.976744},{81,0.0265781},{82,0.777409},{83,0.0232558},{84,0.973422},{85,0.0232558},{86,0.451827},{87,0.00664452},{88,0.973422},{89,0.358804},{90,0.760797},{91,0.0199336},{92,0.986711},{93,0.495017},{94,0.976744},{95,0.0232558},{96,1.},{97,0.0431894},{98,0.980066},{99,0.166113},{100,0.990033},{101,0.388704},{102,0.873754},{103,0.0365449},{104,1.},{105,0.318937},{106,0.980066},{107,0.0797342},{108,0.983389},{109,0.511628},{110,0.790698},{111,0.0398671},{112,0.973422},{113,0.0265781},{114,0.0299003},{115,0.0166113},{116,0.973422},{117,0.0232558},{118,0.345515},{119,0.0199336},{120,0.966777},{121,0.0199336},{122,0.348837},{123,0.013289},{124,0.770764},{125,0.0398671},{126,0.787375},{127,0.0166113},{128,1.},{129,0.840532},{130,0.986711},{131,0.345515},{132,0.980066},{133,0.976744},{134,0.976744},{135,0.495017},{136,1.},{137,0.774086},{138,0.983389},{139,0.973422},{140,0.986711},{141,0.966777},{142,0.9701},{143,0.973422},{144,0.986711},{145,0.342193},{146,0.787375},{147,0.501661},{148,0.980066},{149,0.478405},{150,0.647841},{151,0.760797},{152,0.986711},{153,0.847176},{154,0.790698},{155,0.990033},{156,0.986711},{157,0.9701},{158,0.265781},{159,0.986711},{160,1.},{161,0.694352},{162,0.983389},{163,0.0232558},{164,0.990033},{165,0.707641},{166,0.973422},{167,0.770764},{168,1.},{169,0.960133},{170,0.973422},{171,0.976744},{172,0.990033},{173,0.986711},{174,0.966777},{175,0.980066},{176,0.980066},{177,0.0265781},{178,0.00996678},{179,0.00664452},{180,0.976744},{181,0.813953},{182,0.687708},{183,0.920266},{184,0.973422},{185,0.973422},{186,0.00664452},{187,0.980066},{188,0.734219},{189,0.980066},{190,0.498339},{191,0.993355},{192,1.},{193,0.760797},{194,0.983389},{195,0.887043},{196,0.986711},{197,0.986711},{198,0.986711},{199,0.976744},{200,0.993355},{201,0.973422},{202,0.641196},{203,0.990033},{204,0.983389},{205,0.986711},{206,0.983389},{207,0.993355},{208,0.983389},{209,0.973422},{210,0.740864},{211,0.983389},{212,0.966777},{213,0.980066},{214,0.259136},{215,0.993355},{216,0.654485},{217,0.990033},{218,0.199336},{219,0.993355},{220,0.986711},{221,0.993355},{222,0.990033},{223,1.},{224,1.},{225,0.966777},{226,0.966777},{227,0.976744},{228,0.993355},{229,0.983389},{230,0.737542},{231,0.986711},{232,0.986711},{233,1.},{234,0.627907},{235,1.},{236,0.986711},{237,1.},{238,0.983389},{239,1.},{240,0.980066},{241,0.976744},{242,0.0166113},{243,0.983389},{244,0.976744},{245,0.986711},{246,0.501661},{247,0.996678},{248,0.644518},{249,1.},{250,0.342193},{251,1.},{252,0.980066},{253,1.},{254,0.993355},{255,1.}},Last,Greater][[{1;;20}]]
+In[77]:= (*Function to calculate the percentage of recovery*)MeasureRecovery[rule_,injuryWidth_]:=Module[{steps=150,mixAt=50,init,clean,injured,diff},init=CenterArray[{1},301];
+clean=CellularAutomaton[rule,init,steps];
+(*Generate injured state*)injured=Module[{pre,mid,post},pre=Take[clean,mixAt];
+mid=Last[pre];
+(*Randomly perturb a section of width'injuryWidth'*)mid[[151-injuryWidth;;151+injuryWidth]]=RandomInteger[1,2*injuryWidth+1];
+post=CellularAutomaton[rule,mid,steps-mixAt];
+Join[pre,post]];
+(*Calculate XOR Difference*)diff=MapThread[BitXor,{clean,injured},2];
+(*Final row difference:1.0=Perfect recovery,0.0=Total divergence*)1.0-(Total[Last[diff]]/Length[Last[diff]])];
+
+(*Run for Rule 110 across widths 1 to 50*)
+data=Table[{w,Mean[Table[MeasureRecovery[110,w],{10}]]},{w,1,50,2}];
+ListLinePlot[data,PlotTheme->"Scientific",AxesLabel->{"Injury Width (Cells)","Restoration Score"},PlotLabel->"Rule 110: Resilience as a Function of Injury Scale",Filling->Bottom]
+Out[79]= 
+In[80]:= (*Sweep all 256 rules for resilience to a 10-cell injury*)allRulesResilience=Table[{r,MeasureRecovery[r,5]},{r,0,255}];
+
+(*Visualize the top 20 most resilient rules*)
+topRules=TakeSortBy[allRulesResilience,Last,Greater][[{1;;20}]];
+TableForm[topRules,TableHeadings->{None,{"Rule","Resilience Score"}}]
+During evaluation of In[80]:= Part::pkspec1: The expression {1;;20} cannot be used as a part specification.
+Out[82]//TableForm= TakeSortBy[{{0,1.},{1,0.00332226},{2,0.986711},{3,0.00996678},{4,0.986711},{5,0.013289},{6,0.976744},{7,0.013289},{8,1.},{9,0.0531561},{10,0.983389},{11,0.0265781},{12,0.986711},{13,0.495017},{14,0.966777},{15,0.0299003},{16,0.986711},{17,0.0299003},{18,0.774086},{19,0.},{20,0.976744},{21,0.0166113},{22,0.58804},{23,0.00664452},{24,0.983389},{25,0.0564784},{26,0.747508},{27,0.0332226},{28,0.963455},{29,0.00664452},{30,0.501661},{31,0.0199336},{32,1.},{33,0.00332226},{34,0.980066},{35,0.0232558},{36,0.996678},{37,0.0431894},{38,0.980066},{39,0.0232558},{40,1.},{41,0.0398671},{42,0.9701},{43,0.0332226},{44,0.996678},{45,0.401993},{46,0.980066},{47,0.0299003},{48,0.980066},{49,0.0232558},{50,0.0265781},{51,0.0199336},{52,0.976744},{53,0.00996678},{54,0.335548},{55,0.0365449},{56,0.976744},{57,0.166113},{58,0.0199336},{59,0.0199336},{60,0.860465},{61,0.0332226},{62,0.33887},{63,0.0232558},{64,1.},{65,0.0431894},{66,0.983389},{67,0.0398671},{68,0.990033},{69,0.511628},{70,0.9701},{71,0.0232558},{72,1.},{73,0.534884},{74,0.973422},{75,0.385382},{76,0.983389},{77,0.993355},{78,0.993355},{79,0.498339},{80,0.983389},{81,0.0332226},{82,0.784053},{83,0.0232558},{84,0.980066},{85,0.0265781},{86,0.465116},{87,0.0232558},{88,0.986711},{89,0.418605},{90,0.787375},{91,0.0398671},{92,0.966777},{93,0.508306},{94,0.963455},{95,0.0199336},{96,1.},{97,0.0431894},{98,0.976744},{99,0.169435},{100,0.996678},{101,0.33887},{102,0.893688},{103,0.0365449},{104,0.993355},{105,0.239203},{106,0.930233},{107,0.0531561},{108,0.986711},{109,0.548173},{110,0.790698},{111,0.0498339},{112,0.976744},{113,0.0332226},{114,0.0265781},{115,0.0232558},{116,0.980066},{117,0.0332226},{118,0.33887},{119,0.0199336},{120,0.966777},{121,0.0199336},{122,0.342193},{123,0.0199336},{124,0.784053},{125,0.0465116},{126,0.681063},{127,0.0166113},{128,1.},{129,0.747508},{130,0.986711},{131,0.342193},{132,0.996678},{133,0.960133},{134,0.973422},{135,0.518272},{136,1.},{137,0.767442},{138,0.973422},{139,0.973422},{140,0.990033},{141,0.983389},{142,0.973422},{143,0.973422},{144,0.983389},{145,0.348837},{146,0.681063},{147,0.498339},{148,0.976744},{149,0.498339},{150,0.651163},{151,0.946844},{152,0.986711},{153,0.860465},{154,0.787375},{155,0.980066},{156,0.983389},{157,0.976744},{158,0.27907},{159,0.986711},{160,1.},{161,0.694352},{162,0.980066},{163,0.0332226},{164,0.990033},{165,0.707641},{166,0.966777},{167,0.860465},{168,1.},{169,0.940199},{170,0.9701},{171,0.976744},{172,0.996678},{173,0.980066},{174,0.960133},{175,0.980066},{176,0.980066},{177,0.0265781},{178,0.0166113},{179,0.0398671},{180,0.973422},{181,0.827243},{182,0.674419},{183,0.893688},{184,0.983389},{185,0.973422},{186,0.00664452},{187,0.983389},{188,0.734219},{189,0.986711},{190,0.498339},{191,0.990033},{192,1.},{193,0.767442},{194,0.986711},{195,0.833887},{196,0.990033},{197,0.980066},{198,0.966777},{199,0.976744},{200,1.},{201,0.986711},{202,0.986711},{203,0.993355},{204,0.980066},{205,0.980066},{206,0.983389},{207,0.990033},{208,0.973422},{209,0.973422},{210,0.790698},{211,0.983389},{212,0.966777},{213,0.960133},{214,0.269103},{215,0.980066},{216,0.647841},{217,0.990033},{218,0.199336},{219,0.990033},{220,0.976744},{221,0.986711},{222,0.986711},{223,0.996678},{224,1.},{225,0.906977},{226,0.980066},{227,0.973422},{228,0.993355},{229,0.976744},{230,0.744186},{231,0.986711},{232,0.976744},{233,1.},{234,0.634551},{235,1.},{236,0.973422},{237,0.993355},{238,0.980066},{239,1.},{240,0.976744},{241,0.973422},{242,0.00332226},{243,0.980066},{244,0.973422},{245,0.980066},{246,0.501661},{247,0.993355},{248,0.624585},{249,1.},{250,0.342193},{251,1.},{252,0.986711},{253,1.},{254,0.993355},{255,1.}},Last,Greater][[{1;;20}]]
+In[83]:= (*1. Setup Parameters*)rule=30; (*The rule we are studying*)
+steps1=50; (*Initial evolution time*)
+steps2=100; (*Time after mixing*)
+perturbWidth=20; (*How many cells to'mix up'*)
+(*2. Run the initial evolution*)
+init=CenterArray[{1},201];
+evolution1=CellularAutomaton[rule,init,steps1];
+latestState=Last[evolution1];
+(*3. Mix up the latest cells*)
+(*We replace a central block with random 0s and 1s*)
+mid=IntegerPart[Length[latestState]/2];
+perturbedState=latestState;
+perturbedState[[mid-perturbWidth;;mid+perturbWidth]]=RandomInteger[1,2*perturbWidth+1];
+(*4. Run the recovery evolution*)
+evolution2=CellularAutomaton[rule,perturbedState,steps2];
+(*5. Visualize the result*)
+ArrayPlot[Join[evolution1,evolution2],Mesh->True,ColorRules->{0->White,1->Black},Epilog->{Red,Thickness[0.005],Line[{{0,steps2+steps1-steps1},{201,steps2+steps1-steps1}}]},PlotLabel->"Pattern Restoration Experiment (Red Line = Mixing Point)"]
+Out[94]= 
+In[95]:= (*1. Setup Parameters*)rule=30; (*The rule under study[cite:1,5,207]*)
+steps1=50; (*Initial evolution time[cite:3,6,210]*)
+steps2=100; (*Time after mixing[cite:4,6,211]*)
+perturbWidth=20; (*Width of the'mixed' region[cite:6,212]*)
+(*2. Initial Evolution*)
+init=CenterArray[{1},201];[cite:8,214]
+evolution1=CellularAutomaton[rule,init,steps1];[cite:9,215]
+latestState=Last[evolution1];[cite:10,216]
+(*3. Mixing/Perturbation*)
+mid=IntegerPart[Length[latestState]/2];[cite:13,218]
+perturbedState=latestState;[cite:14,219]
+(*Corrected syntax for part assignment[cite:220]*)
+perturbedState[[mid-perturbWidth;;mid+perturbWidth]]=RandomInteger[1,2*perturbWidth+1];[cite:15,221]
+(*4. Recovery Evolution*)
+evolution2=CellularAutomaton[rule,perturbedState,steps2];[cite:17,223]
+(*5. Visualization*)
+ArrayPlot[Join[evolution1,evolution2],Mesh->True,ColorRules->{0->White,1->Black},[cite:19,20,225,226] Epilog->{Red,Thickness[0.005],Line[{{0,steps1},{201,steps1}}]},(*Fixed coordinate to the mixing point[cite:226]*)PlotLabel->"Pattern Restoration Experiment (Red Line = Mixing Point)"][cite:21,227]
+Out[99]= Null[cite:8,214]
+Out[100]= Null[cite:9,215]
+Out[101]= Null[cite:10,216]
+Out[102]= Null[cite:13,218]
+Out[103]= Null[cite:14,219]
+Out[104]= Null[cite:15,221]
+Out[105]= Null[cite:17,223]
+In[106]:= (*Ruliological Sweep of All 256 Rules*)stepsBefore=100;
+stepsAfter=50;
+width=201;
+results=Table[Module[{init,clean,mixed,diff,midRow,perturbWidth=10},init=CenterArray[{1},width];
+(*1. The'Clean' Path*)clean=CellularAutomaton[rule,init,stepsBefore+stepsAfter];
+(*2. The'Mixed' Path (Interrupt at Row 100)*)midState=clean[[stepsBefore+1]];
+(*Randomize a section of the row*)perturbedState=ReplacePart[midState,Thread[Range[101-perturbWidth,101+perturbWidth]->RandomInteger[1,2 perturbWidth+1]]];
+mixed=Join[Take[clean,stepsBefore],CellularAutomaton[rule,perturbedState,stepsAfter]];
+(*3. The Difference Map (XOR)*)diff=MapThread[BitXor,{clean,mixed},2];
+(*Return a small plot for each rule*)ArrayPlot[diff,ColorRules->{1->Red,0->White},Frame->False,PlotLabel->Style[rule,8]]],{rule,0,255}];
+(*Display as a 16x16 grid*)
+GraphicsGrid[Partition[results,16],ImageSize->1000]
+Out[110]= 
+In[111]:= (*1. Setup Parameters*)rule=30; (*The rule under study[cite:1,5,207]*)
+steps1=50; (*Initial evolution time[cite:3,6,210]*)
+steps2=100; (*Time after mixing[cite:4,6,211]*)
+perturbWidth=20; (*Width of the'mixed' region[cite:6,212]*)
+(*2. Initial Evolution*)
+init=CenterArray[{1},201];[cite:8,214]
+evolution1=CellularAutomaton[rule,init,steps1];[cite:9,215]
+latestState=Last[evolution1];[cite:10,216]
+(*3. Mixing/Perturbation*)
+mid=IntegerPart[Length[latestState]/2];[cite:13,218]
+perturbedState=latestState;[cite:14,219]
+(*Corrected syntax for part assignment[cite:220]*)
+perturbedState[[mid-perturbWidth;;mid+perturbWidth]]=RandomInteger[1,2*perturbWidth+1];[cite:15,221]
+(*4. Recovery Evolution*)
+evolution2=CellularAutomaton[rule,perturbedState,steps2];[cite:17,223]
+(*5. Visualization*)
+ArrayPlot[Join[evolution1,evolution2],Mesh->True,ColorRules->{0->White,1->Black},[cite:19,20,225,226] Epilog->{Red,Thickness[0.005],Line[{{0,steps1},{201,steps1}}]},(*Fixed coordinate to the mixing point[cite:226]*)PlotLabel->"Pattern Restoration Experiment (Red Line = Mixing Point)"][cite:21,227]
+Out[115]= Null[cite:8,214]
+Out[116]= Null[cite:9,215]
+Out[117]= Null[cite:10,216]
+Out[118]= Null[cite:13,218]
+Out[119]= Null[cite:14,219]
+Out[120]= Null[cite:15,221]
+Out[121]= Null[cite:17,223]
+In[122]:= (*Define Parameters*)ruleNumber=110;steps=200;gridSize=200;noiseProb=0.02;
+
+(*Initial State:Single Seed*)initialState=CenterArray[1,gridSize];
+
+(*Function to evolve with noise*)evolveWithNoise[state_,rule_]:=Module[{nextState,noiseMask},nextState=CellularAutomaton[rule,state,1][[2]];noiseMask=RandomChoice[{1-noiseProb,noiseProb}->{0,1},gridSize];BitXor[nextState,noiseMask]];
+
+(*Run the simulation*)stochasticEvolution=NestList[evolveWithNoise[#,ruleNumber]&,initialState,steps];
+
+(*Visualize Results*)ArrayPlot[stochasticEvolution,ColorRules->{0->White,1->Black},Mesh->False,Frame->True,FrameLabel->{"Cell Index","Time Step"},PlotLabel->"Rule "<>ToString[ruleNumber]<>" with "<>ToString[noiseProb*100]<>"% Continuous Noise"]
+Out[126]= 
+In[127]:= (*Parameters*)rule=110;steps=200;gridSizes={50,100,200,500};injuryWidth=10;injuryTime=50;
+
+(*Function to calculate restoration for a specific size) testSize[L_]:=Module[{control,injury,diff},(Control Evolution*)control=CellularAutomaton[rule,CenterArray[1,L],steps];
+
+(*Create Injury at injuryTime*)injuredState=control[[injuryTime+1]];mid=Floor[L/2];injuredState[[mid-Floor[injuryWidth/2];;mid+Floor[injuryWidth/2]]]=RandomInteger[{0,1},injuryWidth+1];
+
+(*Evolve Injury*)injury=CellularAutomaton[rule,injuredState,steps-injuryTime];
+
+(*Compare only the steps after injury*)diff=Total[BitXor[control[[injuryTime+1;;]],injury],2];
+
+(*Return 1 if healed (diff is 0),0 otherwise*)If[diff==0,1,0]];
+
+(*Run the loop and print results*)results=Table[{s,testSize[s]},{s,gridSizes}];Print["Grid Size vs Healing Success (1=Healed, 0=Failed): ",results]
