@@ -1,6 +1,3 @@
-# 📄 `paper_2_clam_patterns/README.md`
-
-```markdown id="clam9r2"
 # Ruliological Clam Patterns
 ### Dimensionality, Symmetry, and High-Fidelity Repair in 2D Cellular Automata
 
