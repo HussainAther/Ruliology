@@ -1,101 +1,116 @@
 # Ruliological Resilience
-### Quantifying Repair, Robustness, and Recovery in Cellular Automata Rule Space
+### Repair, Robustness, and Regeneration in Computational Rule Space
 
 ---
 
 ## 🧠 Overview
 
-This project introduces a computational framework for studying **resilience and repair dynamics** across Wolfram's elementary cellular automata (ECA) rule space.
+This repository contains a unified research program investigating a fundamental question:
 
-We define and measure how systems recover from localized perturbations, revealing a **structured resilience landscape** across rules — and uncovering a potential **complexity–repair tradeoff** intrinsic to computational systems.
+> **Can computational systems repair themselves after disruption?**
 
-This work sits at the intersection of:
+Using cellular automata as a model of rule-based computation, we introduce a quantitative framework for **pattern restoration**, demonstrating that:
+
+- Some rules inherently **heal perturbations**
+- Others exhibit **irreversible divergence**
+- Complex systems negotiate recovery through **structured, scar-like adaptations**
+
+This work connects:
 - Ruliology (Wolfram Physics Project)
-- Complex systems
-- Biological repair dynamics
-- Computational universality
+- Complex systems theory
+- Morphogenesis and biological pattern formation
+- Computational robustness and resilience
 
 ---
 
-## 🚀 Key Idea
+## 📚 Research Program Structure
 
-We ask a simple but powerful question:
+This repository contains two complementary papers:
 
-> *If a computational system is "injured", can it repair itself?*
+---
 
-To answer this, we:
-1. Run a cellular automaton from a clean initial condition
-2. Introduce a localized perturbation ("injury")
-3. Measure how closely the system returns to its original trajectory
+### 📄 Paper 1 — Ruliological Resilience (1D ECA)
+
+**Focus:**
+- Elementary Cellular Automata (256 rules)
+- Perturbation → recovery dynamics
+- Quantitative restoration metrics
+
+**Key Contributions:**
+- Definition of the **Restoration Coefficient (R)**
+- Systematic survey of all ECA rules
+- Identification of three regimes:
+  - Full restoration (Class I/II)
+  - Partial / structured recovery (Class IV)
+  - Irreversible divergence (Class III)
+
+**Core Insight:**
+> Repair is an intrinsic property of rule space—not an emergent biological anomaly.
+
+---
+
+### 📄 Paper 2 — Ruliological Clam Patterns (2D Systems)
+
+**Focus:**
+- 2D totalistic cellular automata
+- Bilateral symmetry (bivalve geometry)
+- Biological pattern resilience
+
+**Key Contributions:**
+- Extension of restoration framework to 2D systems
+- Demonstration of **high restoration (R ≈ 0.98)**
+- Introduction of the **"Clam Surprise"**:
+  > Higher-dimensional systems exhibit dramatically increased robustness
+
+**Core Insight:**
+> Biological systems may operate in regions of rule space optimized for repair.
+
+---
+
+## 🔗 Unifying Thesis
+
+Together, these papers support a broader claim:
+
+> **Resilience is a structural feature of computational systems—and biology exploits high-resilience regions of rule space.**
+
+This suggests:
+- A **geometry of repair** in ruliological space
+- A link between **dimensionality and robustness**
+- A computational basis for **biological regeneration**
 
 ---
 
 ## 📊 Core Metric: Restoration Coefficient (R)
 
-We define resilience via the **restoration coefficient**:
+We define recovery via:
 
 \[
 R = 1 - \langle D(t) \rangle
 \]
 
 Where:
-- \( D(t) \) = normalized divergence between control and perturbed systems
-- \( R \approx 1 \) → strong recovery
-- \( R \approx 0 \) → no recovery
+- \( D(t) \) = normalized divergence between control and perturbed trajectories
 
-We also compute:
-- `RFinal` — final-time recovery
-- `RShift` — shift-tolerant recovery
-- `τ` (tau) — restoration time
+Interpretation:
+- \( R = 1 \): perfect recovery
+- \( R \approx 0 \): persistent divergence
+- intermediate \( R \): partial or scarred recovery
 
 ---
 
-## 🔬 What This Reveals
+## 🧪 Experimental Framework
 
-Across all 256 ECA rules, we observe:
+Across both projects:
 
-- **Class I/II rules** → near-perfect recovery  
-- **Class III (chaotic)** → minimal recovery  
-- **Class IV (complex)** → intermediate, structured resilience  
-
-This suggests a **non-trivial geometry of rule space**:
-- Not just complexity classes
-- But a **repair landscape**
-
----
-
-## 🌌 Big Insight
-
-We find evidence for a:
-
-> **Complexity–Repair Tradeoff**
-
-And even more striking:
-
-> **Dimensionality unlocks higher restoration**
-> (2D systems exceed the apparent 1D ceiling)
-
-This hints at deep connections between:
-- Computation
-- Physics (ruliology)
-- Biological regeneration
-
----
-
-## 🧪 Methods Summary
-
-For each rule:
-
-- Initialize a single-seed state
-- Evolve control trajectory
-- Introduce perturbation at time \( t_p \)
-- Compare trajectories via Hamming distance
-- Compute restoration metrics over time
+1. Initialize system from structured seed
+2. Introduce localized perturbation ("injury")
+3. Compare trajectories via XOR difference mapping
+4. Measure divergence and recovery over time
 
 Perturbation types:
-- `RandomMix`
-- `Void`
-- `BitFlip`
+- Random mixing (noise injection)
+- Void (information removal)
+- Bit-flip (localized mutation)
 
 ---
 
@@ -103,140 +118,115 @@ Perturbation types:
 
 ```
 
-ruliology-resilience/
+ruliological-resilience/
 │
-├── wolfram/
-│   ├── ruliology_histograms.nb
+├── paper_1_eca_resilience/
+│   ├── notebooks/
+│   ├── data/
+│   ├── figures/
+│   └── README.md
+│
+├── paper_2_clam_patterns/
+│   ├── notebooks/
+│   ├── data/
+│   ├── figures/
+│   └── README.md
+│
+├── shared/
+│   ├── divergence_metrics.wl
 │   ├── plotting_utils.wl
-│   └── pipeline.wl
-│
-├── data/
-│   ├── trial_data.csv
-│   └── rule_summary.csv
-│
-├── figures/
-│   ├── restoration_scatter.png
-│   ├── histogram.png
-│   ├── class_boxplot.png
-│   └── phase_diagram.png
-│
-├── docs/
-│   ├── methods.md
-│   └── manuscript_draft.pdf
+│   └── utils.wl
 │
 └── README.md
 
-```
+````
 
 ---
 
-## ▶️ How to Run (Wolfram Mathematica)
+## ▶️ How to Run
 
-Open:
+All simulations are implemented in **Wolfram Mathematica**.
 
-```
-
-wolfram/ruliology_histograms.nb
-
-````
-
-Then evaluate:
+Example:
 
 ```wolfram
 runRuleBatch[Range[0, 255], 50]
 ````
 
-This will:
+This performs:
 
-* Run all 256 rules
-* Perform multiple trials
-* Export summary CSVs
-* Generate plots
-
----
-
-## 📈 Example Outputs
-
-* Scatter: restoration vs rule number
-* Histogram: distribution of resilience
-* Box plots: grouped by Wolfram class
-* Time series: recovery dynamics
-* Phase diagram: entropy vs restoration
+* Multi-trial simulations
+* Restoration metric computation
+* Automatic visualization
 
 ---
 
-## 🧩 Interpretation
+## 📈 Key Findings
 
-This project reframes cellular automata not just as:
+* Restoration is **not uniformly distributed** across rule space
+* Complex rules exhibit **phase-dependent recovery**
+* 2D systems achieve **higher restoration ceilings than 1D**
+* Biological systems align with **high-R regions**
 
-> "simple vs complex"
+---
 
-but as:
+## 🌌 Conceptual Contributions
 
-> **systems with measurable repair capacity**
+This work introduces:
+
+* **Ruliological Resilience** — recovery capacity of a rule
+* **Error Cones** — propagation of divergence
+* **Perturbation Horizon** — boundary of disruption
+* **Functional Scarring** — recovery with spatial displacement
+* **Complexity–Repair Tradeoff**
+* **Dimensionality–Resilience Hypothesis**
 
 ---
 
 ## 🔭 Future Directions
 
-* Extend to 2D cellular automata
-* Map full **ruliological resilience phase space**
-* Connect to biological regeneration models
-* Explore links to computational universality
-* Integrate entropy + information measures
+* Full mapping of **ruliological phase space**
+* Extension to higher-dimensional automata
+* Integration with **biological datasets**
+* Development of **repair-aware AI architectures**
+* Exploration of **ruliological disease and failure modes**
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome!
+We welcome contributions in:
 
-Ideas:
-
-* Add new perturbation operators
-* Improve visualization
-* Extend to higher dimensions
-* Optimize computation (GPU / parallel)
+* Simulation scaling
+* Visualization improvements
+* New rule classes (2D, 3D)
+* Biological data integration
+* Theoretical extensions
 
 ---
 
 ## 📜 Citation (Draft)
 
-If you use this work, please cite:
-
 ```
 Ather, S. H., Gordon, R. (2026).
-Ruliological Resilience: Repair Dynamics in Cellular Automata Rule Space.
+Ruliological Resilience and Pattern Restoration in Computational Systems.
 ```
 
 ---
 
-## ⚡ Inspiration
-
-This work is inspired by:
-
-* Stephen Wolfram's *A New Kind of Science*
-* The Wolfram Physics Project
-* Biological regeneration and morphogenesis
-
----
-
-## 🧑‍💻 Author
+## 🧑‍💻 Authors
 
 **Syed Hussain Ather**
 AI Engineer — AAK Tele-Science
 AI Team Lead — Alter Learning
 
-Collaborator:
-
-* Dr. Richard Gordon
-
----
-
-## 🌟 Final Thought
-
-> Computation is not just about producing patterns —
-> it may also be about **recovering from disruption**.
+**Dr. Richard Gordon**
+Gulf Specimen Marine Laboratory & Aquarium
 
 ---
+
+## ⚡ Final Thought
+
+> Life may not just compute.
+> It may compute in ways that are **designed to recover**.
 
